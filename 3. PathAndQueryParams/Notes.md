@@ -14,6 +14,7 @@
     - whether the request was successfull.
     - whether something went wrong.
     - and what kind of issue occured (if any).
+
 ![alt text](image-1.png)
 
 # HTTP Exception():
