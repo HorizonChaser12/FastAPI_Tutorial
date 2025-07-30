@@ -2,12 +2,12 @@ from fastapi import FastAPI, Path, HTTPException, Query
 from fastapi.responses import JSONResponse
 import json
 from pydantic import BaseModel, Field, computed_field
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Optional
 
 app = FastAPI()
 
 class Patient(BaseModel):
-    
+    # The ... in the field shows that it is required.
     id: Annotated[str,Field(..., description='ID of the patient', examples=['P001'])]  
     name: Annotated[str, Field(..., description='Name of the patient')]
     city: Annotated[str, Field(..., description='Place where the patient is living')]
@@ -44,7 +44,16 @@ def saveData(data):
     with open('patients.JSON','w') as f:
         json.dump(data,f)
          
-
+class PatientUpdate(BaseModel):
+    # id is not repeated here because it is a part of the Patient model.
+    name: Annotated[Optional[str], Field(default=None)]
+    city: Annotated[Optional[str], Field(default=None)]
+    age: Annotated[Optional[int], Field(default=None)]
+    gender: Annotated[Optional[Literal['male', 'female', 'other']], Field(default=None)]
+    height: Annotated[Optional[float], Field(default=None, gt=0)]
+    weight: Annotated[Optional[float], Field(default=None, gt=0)]
+    
+    
 # This is a default endpoint
 @app.get("/")
 def hello():
@@ -109,4 +118,51 @@ def create_patient(patient:Patient):
     # Give a response back to the client that the action has been completed
     
     return JSONResponse(status_code=201, content={'message':'patient created'})
-     
+
+@app.put('/edit/{patient_id}')
+def update_patient(patient_id:str, patient_update:PatientUpdate):
+    data = loadData()
+    if patient_id not in data:
+         raise HTTPException(status_code=404, detail='Patient ID not found.')
+    
+    # This is used to load all the value of the key which was provided to us in the function parameter
+    existing_patient_info = data[patient_id]
+    
+    # We are storing the update info that the client has given to use into a variable. We are coverting it from a pydantic object to a python dictionary with the unset value to true so that the fields which aren't given should not be in the dictionary with null values.
+    updated_patient_info = patient_update.model_dump(exclude_unset=True)
+    
+    # Here are looping through the updated data we have to update the things in the existing data.
+    for key, value in updated_patient_info.items():
+        existing_patient_info[key] = value
+    
+    # This has a issue in it, the problem is that if we update weight and height then we need to recalculate the BMI and verdict too, as it is not updated by itself. 
+    # data[patient_id] = existing_patient_info
+    
+    # This is how you create a pydantic object. But there is still a issue over here, i.e. we have a missing required field i.e id field.
+    existing_patient_info['id'] = patient_id
+    patient_pydantic_object = Patient(**existing_patient_info)
+    
+    # as we dont need the id tag in the other pydantic class we made, so we will exclude it.
+    existing_patient_info = patient_pydantic_object.model_dump(exclude='id')
+    
+    # Add this dict to data
+    data[patient_id] = existing_patient_info
+    
+    # save data
+    saveData(data)
+    
+    return JSONResponse(status_code=200, content='Patient Updated')
+
+
+@app.delete('/delete/{patient_id}')
+def delete_patient(patient_id: str):
+    data = loadData()
+    
+    if patient_id not in data:
+        raise HTTPException(status_code=404, detail='Patient is not found')
+    
+    del data[patient_id]
+    
+    saveData(data)
+    
+    return JSONResponse(status_code=200, content='Patient deleted')
