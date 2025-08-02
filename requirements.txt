@@ -1,0 +1,8 @@
+pandas
+# This should be as it is because the model is trained on a speicific version of sci-kit learn and using latest or older version can make issues while predicting the values.
+scikit-learn = 1.6.1
+FastAPI
+pydantic
+uvicorn
+streamlit
+requests
