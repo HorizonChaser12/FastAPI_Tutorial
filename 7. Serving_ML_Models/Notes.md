@@ -1,0 +1,2 @@
+- We got the model.pkl file from the github of the educator as building a model wasnt listed for the tutorial of FastAPI.
+- Our data will mostly contain raw data and their will be computed fields too. And we would also Transform the data in a better way so that it can used in various ways.
