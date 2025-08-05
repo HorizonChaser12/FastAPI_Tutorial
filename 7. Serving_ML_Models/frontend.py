@@ -1,7 +1,9 @@
 import streamlit as st
 import requests
+import os
 
-API_URL = "http://localhost:8000/predict" 
+# Get the API URL from environment variable, fallback to localhost if not set
+API_URL = os.getenv("API_URL", "http://localhost:8000/predict")
 
 st.title("Insurance Premium Category Predictor")
 st.markdown("Enter your details below:")
