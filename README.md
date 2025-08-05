@@ -1,6 +1,6 @@
 ## Why I am doing this?
 
-Apart from getting knowledge about AI and with this competition we are proceeding ahead of and  more deep, the question here arises is whether we will be able to get more junior poisitions or no, I am here learning about FastAPI to create user friendly apps or Agents.
+Apart from getting knowledge about AI and with this competition we are proceeding ahead off, the question here arises is whether we will be able to get more junior poisitions or no, so to ease up the gaps I am here learning about FastAPI to step up in creating user friendly apps or Agents.
 
 ## What does the repository contains? And what are these folders?
 
